@@ -1,0 +1,205 @@
+*************************************************************
+					Backbone Model
+*************************************************************
+
+	Person = Backbone.Model.extend({
+        initialize: function(){
+            alert("Welcome to this world");
+        }
+    });
+    var person = new Person;
+	
+	
+	set attribute:
+	---------------
+	Person = Backbone.Model.extend({
+        initialize: function(){
+            alert("Welcome to this world");
+        }
+    });
+    var person = new Person({ name: "Thomas", age: 67});
+    // or we can set afterwards, these operations are equivelent
+    var person = new Person();
+    person.set({ name: "Thomas", age: 67});
+	
+	
+	
+	get attribute:
+	-------------
+	Person = Backbone.Model.extend({
+        initialize: function(){
+            alert("Welcome to this world");
+        }
+    });
+    var person = new Person({ name: "Thomas", age: 67, child: 'Ryan'});
+    var age = person.get("age"); // 67
+    var name = person.get("name"); // "Thomas"
+    var child = person.get("child"); // 'Ryan'
+	
+	
+	default attribute:
+	------------------
+	Person = Backbone.Model.extend({
+        defaults: {
+            name: 'Fetus',
+            age: 0,
+            child: ''
+        },
+        initialize: function(){
+            alert("Welcome to this world");
+        }
+    });
+    var person = new Person({ name: "Thomas", age: 67, child: 'Ryan'});
+    var age = person.get("age"); // 67
+    var name = person.get("name"); // "Thomas"
+    var child = person.get("child"); // 'Ryan'
+    
+	
+	setting atttributes by methods:
+	-------------------------------
+	
+	Person = Backbone.Model.extend({
+        defaults: {
+            name: 'Fetus',
+            age: 0,
+            child: ''
+        },
+        initialize: function(){
+            alert("Welcome to this world");
+        },
+        adopt: function( newChildsName ){
+            this.set({ child: newChildsName });
+        }
+    });
+    
+    var person = new Person({ name: "Thomas", age: 67, child: 'Ryan'});
+    person.adopt('John Resig');
+    var child = person.get("child"); // 'John Resig'
+	
+	
+	listener:
+	-----------
+	
+	Person = Backbone.Model.extend({
+        defaults: {
+            name: 'Fetus',
+            age: 0
+        },
+        initialize: function(){
+            alert("Welcome to this world");
+            this.on("change:name", function(model){
+                var name = model.get("name"); // 'Stewie Griffin'
+                alert("Changed my name to " + name );
+            });
+        }
+    });
+    
+    var person = new Person({ name: "Thomas", age: 67});
+    person.set({name: 'Stewie Griffin'}); // This triggers a change and will alert()
+	
+	//'this.on("change", function(model){});' to listen for changes to all attributes of the model.
+	
+	
+	Interacting with the server:
+	=================================
+	
+	Creating a new model:
+	--------------------
+	var UserModel = Backbone.Model.extend({
+        urlRoot: '/user',
+        defaults: {
+            name: '',
+            email: ''
+        }
+    });
+    var user = new Usermodel();
+    // Notice that we haven't set an `id`
+    var userDetails = {
+        name: 'Thomas',
+        email: 'thomasalwyndavis@gmail.com'
+    };
+    // Because we have not set a `id` the server will call
+    // POST /user with a payload of {name:'Thomas', email: 'thomasalwyndavis@gmail.com'}
+    // The server should save the data and return a response containing the new `id`
+    user.save(userDetails, {
+        success: function (user) {
+            alert(user.toJSON());
+        }
+    })
+	
+	
+	Getting a model:
+	-----------------
+	// Here we have set the `id` of the model
+    var user = new Usermodel({id: 1});
+
+    // The fetch below will perform GET /user/1
+    // The server should return the id, name and email from the database
+    user.fetch({
+        success: function (user) {
+            alert(user.toJSON());
+        }
+    })
+	
+	
+	Updating a model:
+	-----------------
+	// Here we have set the `id` of the model
+    var user = new Usermodel({
+        id: 1,
+        name: 'Thomas',
+        email: 'thomasalwyndavis@gmail.com'
+    });
+
+    // Let's change the name and update the server
+    // Because there is `id` present, Backbone.js will fire
+    // PUT /user/1 with a payload of `{name: 'Davis', email: 'thomasalwyndavis@gmail.com'}`
+    user.save({name: 'Davis'}, {
+        success: function (model) {
+            alert(user.toJSON());
+        }
+    });
+	
+	Deleting a model:
+	-----------------
+	// Here we have set the `id` of the model
+    var user = new Usermodel({
+        id: 1,
+        name: 'Thomas',
+        email: 'thomasalwyndavis@gmail.com'
+    });
+
+    // Because there is `id` present, Backbone.js will fire
+    // DELETE /user/1 
+    user.destroy({
+        success: function () {
+            alert('Destroyed');
+        }
+    });
+	
+	Validation:
+	-----------
+	Person = Backbone.Model.extend({
+        // If you return a string from the validate function,
+        // Backbone will throw an error
+        validate: function( attributes ){
+            if( attributes.age < 0 && attributes.name != "Dr Manhatten" ){
+                return "You can't be negative years old";
+            }
+        },
+        initialize: function(){
+            alert("Welcome to this world");
+            this.bind("error", function(model, error){
+                // We have received an error, log it, alert it or forget it :)
+                alert( error );
+            });
+        }
+    });
+    
+    var person = new Person;
+    person.set({ name: "Mary Poppins", age: -1 }); 
+    // Will trigger an alert outputting the error
+    
+    var person = new Person;
+    person.set({ name: "Dr Manhatten", age: -1 });
+    // God have mercy on our souls
