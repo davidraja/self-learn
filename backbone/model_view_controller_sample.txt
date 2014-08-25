@@ -1,0 +1,230 @@
+/*
+* Model - View - Controller [sample]
+*/
+
+************************************
+			* Model *
+************************************
+var MyModel = Backbone.Model.extend({
+	defaults : {
+		name : '',
+		email :'',
+		country : '',
+		booking : {
+			id : '',
+			flight : '',
+			origin : '',
+			destination : '',
+			created : '8/22/2014'
+		}
+	}
+});
+
+var obj = new MyModel({name: 'David', email: 'vdraja87@gmail.com', country: 'IN'});
+
+//example : setter
+var obj1 = new MyModel();
+obj1.set('name', 'Jose');
+obj1.set('email','jo.it@gmail.com');
+obj1.set('country','IN');
+
+//example : getter
+var name = obj1.get('name');
+var email = obj1.get('email');
+var country = obj1.get('country');
+
+
+************************************
+	* View * [js/views/myview.js]
+************************************
+var DemoView = Backbone.View.extend({
+	el : '#container',
+	
+	initialize : function(){
+		this.render();
+	},
+	
+	render : function(){
+		var t = '<ul>';
+		var i;
+		
+		for(i=0; i<10; i++){
+			t = t + '<li> data ' + i + '</li>';
+		}
+		t = t + '</ul>';
+		
+		this.$el.html(t);
+		return this;
+	}
+});
+
+var app = new DemoView();
+
+************************************
+	* RUN HTML * [demoview.html]
+************************************
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Demo Backbone View</title>
+		<script src="js/lib/jquery-1.11.1.min.js"></script>
+		<script src="js/lib/underscore-min.js"></script>
+		<script src="js/lib/backbone-min.js"></script>
+	</head>
+	<body>
+		<h1>Demo View</h1><br>
+		<div id="container">Loading......</div>
+		
+		<script src="js/views/myview.js"></script>
+	</body>
+</html>
+
+----------------------------------------------------------------------------------------------
+
+************************************
+	  * Using Model in View *
+************************************
+var Book = Backbone.Model.extend({  [js/models/book.js]
+	defaults : {
+		title : '',
+		author : '',
+		publisher : '',
+		year : 0
+	}
+});
+
+
+var BookView = Backbone.View.extend({  [js/views/bookview.js]
+	el : '#container',
+	
+	initialize : function(){
+		this.render();
+	},
+	
+	render : function(){
+		var t = '<p>Title : ' + this.model.get('title') + '</p>'
+				+ '<p>Author : ' + this.model.get('author') + '</p>'
+				+ '<p>Publisher : ' +  this.model.get('publisher') + '</p>'
+				+ '<p>Year : ' + this.model.get('year') + '</p>';
+		
+		this.$el.html(t);
+		return this;
+	}
+});
+var book = new Book({
+	title : 'Backbone.js Programming by Example',
+	author : 'Agus Kurnniawan',
+	publisher : 'PE Press',
+	year : 2014
+});
+var appView = new BookView({model:book});
+
+
+<!DOCTYPE html>		 					[mybook.html]
+<html>
+	<head>
+		<title>My Book</title>
+		<script src="js/lib/jquery-1.11.1.min.js"></script>
+		<script src="js/lib/underscore-min.js"></script>
+		<script src="js/lib/backbone-min.js"></script>
+	</head>
+	<body>
+		<h1>Demo Model and View</h1><br>
+		<div id="container">Loading......</div>
+		
+		<script src="js/models/book.js"></script>
+		<script src="js/views/bookview.js"></script>
+	</body>
+</html>
+
+----------------------------------------------------------------------------------------------
+
+************************************
+ * Collection * [collectiondemo.js]
+************************************
+i) creating collection:
+----------------------
+
+var BookCollection = Backbone.Collection.extend({
+	model: Book
+});
+
+
+var books = new BookCollection();
+var i, book;
+
+
+ii)Adding Data: add() or push()
+-------------------------------
+
+console.log("-- insert collection --");
+for(i=0; i<5; i++) {
+	var year = 2013;
+	if( (i%2) == 0){
+		year = 2014;
+	}
+	
+	book = new Book({
+		title : 'title ' + i,
+		author : 'author ' + i,
+		publisher : 'publisher ' + i,
+		year : year
+	});
+	
+	books.add(book);// (or) books.push(book);It will be added at the end of a collection
+}
+console.log(books);
+
+iii)Retrieving Data:
+-------------------
+ge() -> pass parameter id
+at() -> pass index value
+
+console.log("-- retrieve collection --")
+for(i=0; i<books.length; i++) {
+	book = books.at(i);
+	console.log(book);
+}
+
+iv)Finding Data:
+---------------
+
+console.log("-- finding collection --")
+var colls = books.where({year: 2014});
+for(var i=0; i<colls.length; i++){
+	book = colls[i];
+	console.log(book);
+}
+
+v)Removing Data:
+---------------
+
+console.log("-- remove collection --");
+book = books.at(2);
+books.remove(book);
+for(i=0; i<books.length; i++) {
+	book = books.at(i);
+	console.log(book);
+}
+
+books.pop() // It will be remove the last item of a collection
+
+
+<!DOCTYPE html>		 					[collectiondemo.html]
+<html>
+	<head>
+		<title>Demo Collection</title>
+		<script src="js/lib/jquery-1.11.1.min.js"></script>
+		<script src="js/lib/underscore-min.js"></script>
+		<script src="js/lib/backbone-min.js"></script>
+	</head>
+	<body>
+		<h1>Demo Collection</h1><br>
+		<br>
+		
+		<script src="js/models/book.js"></script>
+		<script src="js/collections/books.js"></script>
+		<script src="js/views/collectiondemo.js"></script>
+	</body>
+</html>
+----------------------------------------------------------------------------------------------
